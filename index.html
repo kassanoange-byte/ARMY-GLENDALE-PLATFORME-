@@ -8,49 +8,111 @@
 
 <title>Rapport Unité Entraînement</title>
 
+
 <style>
 
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI";
-background:linear-gradient(135deg,#0b1f0d,#1d3b20,#000);
-color:white;
-min-height:100vh;
-display:flex;
-justify-content:center;
+*{
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
 }
 
 
-.app{
+body{
 
-width:90%;
-max-width:420px;
+margin:0;
+min-height:100vh;
+
+background:
+radial-gradient(circle at top,#496b3b,#071107 60%);
+
+color:white;
+
+display:flex;
+justify-content:center;
+
+}
+
+
+.container{
+
+width:92%;
+max-width:430px;
+
 margin-top:30px;
 
-background:rgba(255,255,255,0.12);
-backdrop-filter:blur(20px);
-
 padding:25px;
-border-radius:30px;
+
+background:rgba(255,255,255,0.13);
+
+border:1px solid rgba(255,255,255,0.25);
+
+backdrop-filter:blur(25px);
+
+-webkit-backdrop-filter:blur(25px);
+
+border-radius:35px;
+
+box-shadow:
+0 20px 50px rgba(0,0,0,.5);
+
+
+}
+
+
+
+.logo{
+
+font-size:55px;
+text-align:center;
 
 }
 
 
 h1{
+
 text-align:center;
+font-size:26px;
+
 }
 
 
-input,button{
+
+span{
+
+color:#9cff88;
+
+}
+
+
+
+input{
 
 width:100%;
-padding:15px;
-margin-top:12px;
+
+padding:16px;
+
+margin-top:15px;
+
+border-radius:18px;
 
 border:none;
-border-radius:20px;
+
+outline:none;
+
+background:rgba(255,255,255,.18);
+
+color:white;
 
 font-size:16px;
+
+
+}
+
+
+
+input::placeholder{
+
+color:#ddd;
 
 }
 
@@ -58,21 +120,44 @@ font-size:16px;
 
 button{
 
-background:#315f38;
+width:100%;
+
+padding:16px;
+
+margin-top:15px;
+
+border-radius:20px;
+
+border:none;
+
+background:
+linear-gradient(135deg,#315d36,#1c351f);
+
 color:white;
+
+font-size:17px;
+
 font-weight:bold;
 
 }
 
 
+
 .card{
 
-background:rgba(0,0,0,.3);
-padding:20px;
-border-radius:20px;
 margin-top:20px;
 
+padding:20px;
+
+background:rgba(0,0,0,.25);
+
+border-radius:25px;
+
+border:1px solid rgba(255,255,255,.15);
+
+
 }
+
 
 
 .hidden{
@@ -82,56 +167,83 @@ display:none;
 }
 
 
+
+.title{
+
+text-align:center;
+
+font-size:20px;
+
+}
+
+
+
 </style>
 
 </head>
 
 
+
 <body>
 
 
-<div class="app">
+<div class="container">
+
+
+<div class="logo">
+🪖
+</div>
 
 
 <h1>
-🪖 Rapport<br>
-Unité Entraînement
+Rapport<br>
+<span>Unité Entraînement</span>
 </h1>
+
 
 
 <!-- RECHERCHE -->
 
 
-<div id="recherche">
+<div id="home">
 
 
-<h3>🔎 Recherche Soldat</h3>
+<h3>
+🔎 Recherche Soldat
+</h3>
 
 
-<input id="rechercheNom" placeholder="Nom du soldat">
+<input id="search"
+placeholder="Nom du soldat">
 
 
-<button onclick="chercher()">
-Rechercher
+<button onclick="rechercher()">
+
+🔍 Rechercher
+
 </button>
 
 
-<div id="resultat" class="card hidden">
 
-<h3 id="nomResultat"></h3>
+<div id="result" class="card hidden">
 
-<p id="gradeResultat"></p>
+
+<h2 id="nomResult"></h2>
+
+<p id="gradeResult"></p>
 
 <p>
-Entraînements :
-<b id="nombreResultat"></b>
+📊 Nombre d'entraînements :
+<b id="countResult"></b>
 </p>
+
 
 
 </div>
 
 
-<button onclick="ouvrirAdmin()">
+
+<button onclick="adminLogin()">
 
 ⚙️ Administration
 
@@ -149,41 +261,54 @@ Entraînements :
 <div id="admin" class="hidden">
 
 
-<h2>
+<h2 class="title">
+
 ⚙️ Administration
+
 </h2>
 
 
-<input id="nom" placeholder="Nom du soldat">
+<input id="soldatNom"
+placeholder="Nom du soldat">
 
 
-<input id="grade" placeholder="Grade">
+<input id="soldatGrade"
+placeholder="Grade du soldat">
 
 
-<button onclick="ajouterSoldat()">
 
-➕ Ajouter au rapport
+<button onclick="ajouter()">
+
+➕ Ajouter entraînement
 
 </button>
+
 
 
 <div class="card">
 
-<h3>Rapport actuel</h3>
+<h3>
+📋 Derniers rapports
+</h3>
+
 
 <div id="liste"></div>
 
+
 </div>
+
 
 
 <button onclick="retour()">
 
-⬅️ Retour recherche
+⬅️ Retour
 
 </button>
 
 
+
 </div>
+
 
 
 </div>
@@ -195,40 +320,51 @@ Entraînements :
 <script>
 
 
-let soldats = JSON.parse(localStorage.getItem("soldats")) || [];
+let rapports =
+JSON.parse(localStorage.getItem("rapports")) || [];
 
 
 
-function chercher(){
+
+// RECHERCHE
 
 
-let nom = document.getElementById("rechercheNom").value.toLowerCase();
+function rechercher(){
 
 
-let trouve = soldats.filter(
-s => s.nom.toLowerCase() === nom
+let nom =
+document.getElementById("search").value
+.trim()
+.toLowerCase();
+
+
+
+let soldats =
+rapports.filter(
+r=>r.nom.toLowerCase()==nom
 );
 
 
 
-if(trouve.length>0){
+if(soldats.length){
 
 
-document.getElementById("resultat").classList.remove("hidden");
+document.getElementById("result")
+.classList.remove("hidden");
 
 
-document.getElementById("nomResultat").innerHTML =
-"🪖 "+trouve[0].nom;
-
-
-document.getElementById("gradeResultat").innerHTML =
-"🎖 Grade : "+trouve[0].grade;
+document.getElementById("nomResult").innerHTML=
+"🪖 "+soldats[0].nom;
 
 
 
-document.getElementById("nombreResultat").innerHTML =
-trouve.length;
+document.getElementById("gradeResult").innerHTML=
+"🎖 Grade : "+soldats[0].grade;
 
+
+
+document.getElementById("countResult").innerHTML=
+soldats.length;
 
 
 }
@@ -248,21 +384,25 @@ alert("Soldat introuvable");
 
 
 
-function ouvrirAdmin(){
+// ADMIN
 
 
-let mdp = prompt("Mot de passe administration");
+function adminLogin(){
 
 
-if(mdp==="Kassano@10"){
+let pass=prompt(
+"Mot de passe administration"
+);
 
 
-document.getElementById("recherche").classList.add("hidden");
-
-document.getElementById("admin").classList.remove("hidden");
+if(pass==="Kassano@10"){
 
 
-afficherListe();
+home.classList.add("hidden");
+
+admin.classList.remove("hidden");
+
+afficher();
 
 
 }
@@ -282,18 +422,21 @@ alert("Mot de passe incorrect");
 
 
 
-function ajouterSoldat(){
+function ajouter(){
 
 
-let nom=document.getElementById("nom").value;
-
-let grade=document.getElementById("grade").value;
-
+let nom =
+document.getElementById("soldatNom").value;
 
 
-if(nom==="" || grade===""){
+let grade =
+document.getElementById("soldatGrade").value;
 
-alert("Remplis tous les champs");
+
+
+if(!nom || !grade){
+
+alert("Complète les informations");
 
 return;
 
@@ -301,7 +444,7 @@ return;
 
 
 
-soldats.push({
+rapports.push({
 
 nom:nom,
 
@@ -314,16 +457,17 @@ date:new Date().toLocaleDateString()
 
 
 localStorage.setItem(
-"soldats",
-JSON.stringify(soldats)
+"rapports",
+JSON.stringify(rapports)
 );
 
 
 
-alert("Soldat enregistré");
+alert("Rapport enregistré");
 
 
-afficherListe();
+afficher();
+
 
 
 }
@@ -332,27 +476,27 @@ afficherListe();
 
 
 
-function afficherListe(){
-
-
-let liste=document.getElementById("liste");
+function afficher(){
 
 
 liste.innerHTML="";
 
 
-soldats.forEach(s=>{
+rapports.slice(-10).reverse()
+.forEach(r=>{
 
 
 liste.innerHTML +=
 
 `
+
 <p>
-🪖 ${s.nom}<br>
-🎖 ${s.grade}<br>
-📅 ${s.date}
+🪖 ${r.nom}<br>
+🎖 ${r.grade}<br>
+📅 ${r.date}
 </p>
 <hr>
+
 `;
 
 
@@ -368,9 +512,9 @@ liste.innerHTML +=
 function retour(){
 
 
-document.getElementById("admin").classList.add("hidden");
+admin.classList.add("hidden");
 
-document.getElementById("recherche").classList.remove("hidden");
+home.classList.remove("hidden");
 
 
 }
