@@ -332,16 +332,15 @@ JSON.parse(localStorage.getItem("rapports")) || [];
 function rechercher(){
 
 
-let nom =
-document.getElementById("search").value
+let nom = document.getElementById("search")
+.value
 .trim()
 .toLowerCase();
 
 
 
-let soldats =
-rapports.filter(
-r=>r.nom.toLowerCase()==nom
+let soldats = rapports.filter(r =>
+r.nom.trim().toLowerCase().includes(nom)
 );
 
 
