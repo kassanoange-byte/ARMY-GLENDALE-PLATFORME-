@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,87 +10,47 @@
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
 body{
-    min-height:100vh;
-    background:
-    linear-gradient(135deg,#0b1f12,#263b27,#111);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:white;
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI";
+background:linear-gradient(135deg,#0b1f0d,#1d3b20,#000);
+color:white;
+min-height:100vh;
+display:flex;
+justify-content:center;
 }
 
 
-.container{
+.app{
 
-    width:90%;
-    max-width:420px;
-    background:rgba(255,255,255,0.12);
-    backdrop-filter:blur(20px);
-    border-radius:30px;
-    padding:30px;
-    box-shadow:0 20px 50px rgba(0,0,0,.5);
-    border:1px solid rgba(255,255,255,.2);
+width:90%;
+max-width:420px;
+margin-top:30px;
 
-}
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(20px);
 
+padding:25px;
+border-radius:30px;
 
-.logo{
-
-    text-align:center;
-    font-size:45px;
 }
 
 
 h1{
-
-    text-align:center;
-    font-size:24px;
-    margin-bottom:25px;
-
+text-align:center;
 }
 
 
-h1 span{
+input,button{
 
-    color:#8cff8c;
+width:100%;
+padding:15px;
+margin-top:12px;
 
-}
+border:none;
+border-radius:20px;
 
-
-.search-box input{
-
-    width:100%;
-    padding:15px;
-    border-radius:20px;
-    border:none;
-    outline:none;
-    font-size:16px;
-
-}
-
-
-.result{
-
-    margin-top:20px;
-    background:rgba(0,0,0,.25);
-    padding:20px;
-    border-radius:20px;
-    display:none;
-
-}
-
-
-.result h2{
-
-    color:#8cff8c;
+font-size:16px;
 
 }
 
@@ -96,32 +58,26 @@ h1 span{
 
 button{
 
-    width:100%;
-    margin-top:25px;
-    padding:15px;
-    border:none;
-    border-radius:20px;
-    background:#355e3b;
-    color:white;
-    font-size:17px;
-    font-weight:bold;
+background:#315f38;
+color:white;
+font-weight:bold;
 
 }
 
 
-button:hover{
+.card{
 
-    background:#477d4e;
+background:rgba(0,0,0,.3);
+padding:20px;
+border-radius:20px;
+margin-top:20px;
 
 }
 
 
-.footer{
+.hidden{
 
-    text-align:center;
-    margin-top:20px;
-    opacity:.6;
-    font-size:13px;
+display:none;
 
 }
 
@@ -134,87 +90,287 @@ button:hover{
 <body>
 
 
-<div class="container">
-
-
-<div class="logo">
-🪖
-</div>
+<div class="app">
 
 
 <h1>
-Rapport <span>Unité</span><br>
-Entraînement
+🪖 Rapport<br>
+Unité Entraînement
 </h1>
 
 
-
-<div class="search-box">
-
-<input 
-type="text" 
-id="soldat"
-placeholder="🔎 Rechercher un soldat">
+<!-- RECHERCHE -->
 
 
-</div>
+<div id="recherche">
 
 
+<h3>🔎 Recherche Soldat</h3>
 
-<div class="result" id="result">
 
-<h2 id="nom"></h2>
+<input id="rechercheNom" placeholder="Nom du soldat">
+
+
+<button onclick="chercher()">
+Rechercher
+</button>
+
+
+<div id="resultat" class="card hidden">
+
+<h3 id="nomResultat"></h3>
+
+<p id="gradeResultat"></p>
 
 <p>
-Entraînements réalisés :
-<b id="nombre">0</b>
+Entraînements :
+<b id="nombreResultat"></b>
 </p>
 
 
 </div>
 
 
-
-
-<button onclick="administration()">
+<button onclick="ouvrirAdmin()">
 
 ⚙️ Administration
 
 </button>
 
 
-
-<div class="footer">
-
-Système de gestion militaire
-
 </div>
 
 
 
+
+<!-- ADMIN -->
+
+
+<div id="admin" class="hidden">
+
+
+<h2>
+⚙️ Administration
+</h2>
+
+
+<input id="nom" placeholder="Nom du soldat">
+
+
+<input id="grade" placeholder="Grade">
+
+
+<button onclick="ajouterSoldat()">
+
+➕ Ajouter au rapport
+
+</button>
+
+
+<div class="card">
+
+<h3>Rapport actuel</h3>
+
+<div id="liste"></div>
+
 </div>
+
+
+<button onclick="retour()">
+
+⬅️ Retour recherche
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
 
 
 
 <script>
 
 
-function administration(){
-
-let mdp = prompt("Mot de passe administration :");
+let soldats = JSON.parse(localStorage.getItem("soldats")) || [];
 
 
-if(mdp === "Kassano@10"){
 
-alert("Accès administration autorisé");
+function chercher(){
+
+
+let nom = document.getElementById("rechercheNom").value.toLowerCase();
+
+
+let trouve = soldats.filter(
+s => s.nom.toLowerCase() === nom
+);
+
+
+
+if(trouve.length>0){
+
+
+document.getElementById("resultat").classList.remove("hidden");
+
+
+document.getElementById("nomResultat").innerHTML =
+"🪖 "+trouve[0].nom;
+
+
+document.getElementById("gradeResultat").innerHTML =
+"🎖 Grade : "+trouve[0].grade;
+
+
+
+document.getElementById("nombreResultat").innerHTML =
+trouve.length;
+
+
 
 }
 
 else{
 
-alert("Mot de passe incorrect");
+
+alert("Soldat introuvable");
+
 
 }
+
+
+
+}
+
+
+
+
+function ouvrirAdmin(){
+
+
+let mdp = prompt("Mot de passe administration");
+
+
+if(mdp==="Kassano@10"){
+
+
+document.getElementById("recherche").classList.add("hidden");
+
+document.getElementById("admin").classList.remove("hidden");
+
+
+afficherListe();
+
+
+}
+
+else{
+
+
+alert("Mot de passe incorrect");
+
+
+}
+
+
+}
+
+
+
+
+
+function ajouterSoldat(){
+
+
+let nom=document.getElementById("nom").value;
+
+let grade=document.getElementById("grade").value;
+
+
+
+if(nom==="" || grade===""){
+
+alert("Remplis tous les champs");
+
+return;
+
+}
+
+
+
+soldats.push({
+
+nom:nom,
+
+grade:grade,
+
+date:new Date().toLocaleDateString()
+
+});
+
+
+
+localStorage.setItem(
+"soldats",
+JSON.stringify(soldats)
+);
+
+
+
+alert("Soldat enregistré");
+
+
+afficherListe();
+
+
+}
+
+
+
+
+
+function afficherListe(){
+
+
+let liste=document.getElementById("liste");
+
+
+liste.innerHTML="";
+
+
+soldats.forEach(s=>{
+
+
+liste.innerHTML +=
+
+`
+<p>
+🪖 ${s.nom}<br>
+🎖 ${s.grade}<br>
+📅 ${s.date}
+</p>
+<hr>
+`;
+
+
+});
+
+
+}
+
+
+
+
+
+function retour(){
+
+
+document.getElementById("admin").classList.add("hidden");
+
+document.getElementById("recherche").classList.remove("hidden");
 
 
 }
@@ -225,4 +381,5 @@ alert("Mot de passe incorrect");
 
 
 </body>
+
 </html>
